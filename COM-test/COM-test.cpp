@@ -54,7 +54,7 @@ int main() {
 	setlocale(LC_ALL, "Russian");
     HANDLE hSerial = CreateFile(L"COM1", GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0, NULL);
     if (hSerial == INVALID_HANDLE_VALUE) {
-        cerr << "Ошибка открытия COM1\n";
+        cerr << "Ошибка открытия COM\n";
         return 1;
     }
 
@@ -62,9 +62,10 @@ int main() {
 
     const char* message = "Loopback test!";
     SendData(hSerial, message);
-    Sleep(100); 
+    Sleep(1000); 
     ReceiveData(hSerial);
 
     CloseHandle(hSerial);
+    system("pause");
     return 0;
 }
