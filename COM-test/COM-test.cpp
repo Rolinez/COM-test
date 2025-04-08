@@ -18,7 +18,7 @@ void ConfigureSerialPort(HANDLE hSerial) {
 
     if (!SetCommState(hSerial, &dcbSerialParams)) {
         cerr << "Ошибка установки параметров COM-порта\n";
-    }
+    }   
 
     COMMTIMEOUTS timeouts = { 0 };
     timeouts.ReadIntervalTimeout = 50;
@@ -51,10 +51,24 @@ void ReceiveData(HANDLE hSerial) {
 }
 
 int main() {
-	setlocale(LC_ALL, "Russian");
-    HANDLE hSerial = CreateFile(L"COM1", GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0, NULL);
+    setlocale(LC_ALL, "Russian");
+
+    int portNumber;
+    cout << "Введите номер COM-порта (например, 1 для COM1): ";
+    cin >> portNumber;
+
+    if (portNumber < 1 || portNumber > 256) {
+        cerr << "Недопустимый номер порта\n";
+        system("pause");
+        return 1;
+    }
+    wchar_t portName[20];
+    swprintf_s(portName, L"\\\\.\\COM%d", portNumber);
+
+    HANDLE hSerial = CreateFileW(portName, GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0, NULL);
     if (hSerial == INVALID_HANDLE_VALUE) {
-        cerr << "Ошибка открытия COM\n";
+        cerr << "Ошибка открытия COM-порта " << portNumber << endl;
+        system("pause");
         return 1;
     }
 
@@ -62,10 +76,10 @@ int main() {
 
     const char* message = "Loopback test!";
     SendData(hSerial, message);
-    Sleep(1000); 
     ReceiveData(hSerial);
 
     CloseHandle(hSerial);
     system("pause");
     return 0;
 }
+
